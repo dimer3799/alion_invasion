@@ -11,10 +11,10 @@ def run_game():
     ai_setting = Setting()
     screen = pygame.display.set_mode((ai_setting.screen_width, ai_setting.screen_heigth))
     pygame.display.set_caption('Game by Dimer v1.0')
-    ship = Ship(screen)
-    bg_color = (230,230,230)
+    ship = Ship(ai_setting,screen)
     while True:      
-        gf.check_events()
+        gf.check_events(ship)
+        ship.update()
         gf.update_screen(ai_setting,screen,ship)
 
 
