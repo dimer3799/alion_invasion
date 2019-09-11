@@ -17,7 +17,8 @@ def run_game():
     while True:      
         gf.check_events(ai_setting, screen, ship, bullets)
         ship.update()
-        bullets.update()
+        gf.update_bullets(bullets)
+        # print(len(bullets)) # Вывод в терминале склько пуль на экране
         gf.update_screen(ai_setting, screen, ship, bullets)
 
 
