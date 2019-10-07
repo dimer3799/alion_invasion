@@ -87,3 +87,20 @@ def get_number_rows(ai_setting, ship_height, alien_height):
     available_space_y = (ai_setting.screen_heigth - (3 * alien_height) - ship_height)
     number_rows = int(available_space_y / (2 * alien_height))
     return number_rows
+
+def update_alians(ai_setting, alians):
+    # Обнавляем позиции пришельцев
+    check_fleet_edges(ai_setting, alians)
+    alians.update()
+
+def check_fleet_edges(ai_setting, alians):
+    # Опускаем флот и меняем напраление
+    for alian in alians.sprites():
+        if alian.check_edges():
+            chenge_fleet_direction(ai_setting, alians)
+            break
+
+def chenge_fleet_direction(ai_setting, alians):
+    for alian in alians.sprites():
+        alian.rect.y += ai_setting.fleet_drop_speed
+    ai_setting.fleet_direction *= -1

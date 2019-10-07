@@ -23,6 +23,7 @@ def run_game():
         gf.check_events(ai_setting, screen, ship, bullets)
         ship.update()
         gf.update_bullets(bullets)
+        gf.update_alians(ai_setting, alians)
         # print(len(bullets)) # Вывод в терминале склько пуль на экране
         gf.update_screen(ai_setting, screen, ship, alians, bullets)
 
