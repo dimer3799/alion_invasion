@@ -1,6 +1,8 @@
 import sys, pygame
 from bullet import Bullet
 from alian import Alian
+from time import sleep
+
 
 def check_keydown_events(event, ai_setting, screen, ship, bullets):
     # Проверка нажатия клавиш
@@ -44,12 +46,21 @@ def update_screen(ai_setting, screen, ship, alians, bullets):
     #Отображение последнего прорисованного экрана
     pygame.display.flip()
 
-def update_bullets(bullets):
+def update_bullets(ai_setting, screen, ship, alians, bullets):
     bullets.update()
     # Удаление пуль вышешедших за край
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+    check_bullet_alien_collisions(ai_setting, screen, ship, alians, bullets) 
+
+def check_bullet_alien_collisions(ai_setting, screen, ship, alians, bullets):
+    # Обработка коллизий пул с пришельцами
+    collisions = pygame.sprite.groupcollide(bullets, alians, True, True)
+    if len(alians) == 0:
+        # Уничтожение существующих пуль и создание нового флота
+        bullets.empty()
+        create_fleet(ai_setting, screen, ship, alians)
 
 def fire_bullet(ai_setting, screen, ship, bullets):
     # Создание новой пули и включение ее в групу bullets
@@ -88,10 +99,16 @@ def get_number_rows(ai_setting, ship_height, alien_height):
     number_rows = int(available_space_y / (2 * alien_height))
     return number_rows
 
-def update_alians(ai_setting, alians):
+def update_alians(ai_setting, stats, screen, ship, alians, bullets):
     # Обнавляем позиции пришельцев
     check_fleet_edges(ai_setting, alians)
     alians.update()
+    # Проверка коллизий пришелец и корабль
+    if pygame.sprite.spritecollideany(ship, alians):
+        ship_hit(ai_setting, stats, screen, ship, alians, bullets)
+
+    # Проверка пришельцев, достигших нижнего края
+    check_aliens_bottom(ai_setting, stats, screen, ship, alians, bullets)
 
 def check_fleet_edges(ai_setting, alians):
     # Опускаем флот и меняем напраление
@@ -104,3 +121,31 @@ def chenge_fleet_direction(ai_setting, alians):
     for alian in alians.sprites():
         alian.rect.y += ai_setting.fleet_drop_speed
     ai_setting.fleet_direction *= -1
+
+
+def ship_hit(ai_setting, stats, screen, ship, aliens, bullets):
+    #Обработка столкновения пришельца с кораблем
+    # Уменьшаем количество кораблей
+    if stats.ship_left >0:
+        stats.ship_left -= 1
+
+        #Очистка списков пришельцев и пуль
+        aliens.empty()
+        bullets.empty() 
+
+        #Создание нового флота
+        create_fleet(ai_setting, screen, ship, aliens)
+        ship.center_ship()
+
+        # Пауза
+        sleep(0.5)
+    else:
+        stats.game_active = False
+
+def check_aliens_bottom(ai_setting, stats, screen, ship, aliens, bullets):
+    # Проверка добрались ли прищельцы до нижнего края
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            ship_hit(ai_setting, stats, screen, ship, aliens, bullets)
+            break

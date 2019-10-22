@@ -15,6 +15,8 @@ class Ship():
         self.moving_reight = False
         self.moving_left = False
 
+    def center_ship(self):
+        self.center = self.screen_rect.centerx
 
     def update(self):
         # Обнавление позиции корабля с учетом флага
