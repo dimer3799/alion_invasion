@@ -1,7 +1,7 @@
 class GameStats():
     def __init__(self, ai_settings):
-        # Игра запускается при активном состоянии
-        self.game_active = True
+        # Игра запускается в неактивном состоянии
+        self.game_active = False
         
         # Статистика
         self.ai_settings = ai_settings

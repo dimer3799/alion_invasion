@@ -23,7 +23,7 @@ def check_keyup_events(event, ship):
         ship.moving_left = False
 
 
-def check_events( ai_setting, screen, ship, bullets):
+def check_events(ai_setting, screen, ship, bullets, stats, play_button, aliens):
     #Обработка нажатий клавиш и событий мыши
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -33,9 +33,28 @@ def check_events( ai_setting, screen, ship, bullets):
                 check_keydown_events(event, ai_setting, screen, ship, bullets)
             elif event.type == pygame.KEYUP:
                 check_keyup_events(event, ship)
-                
 
-def update_screen(ai_setting, screen, ship, alians, bullets):
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                check_play_buttons(ai_setting, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+               
+
+def check_play_buttons(ai_setting, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+    # Запускаем игру при нажатии на Play
+    if play_button.rect.collidepoint(mouse_x, mouse_y):
+        # Сброс игровой статистики
+        stats.reset_stats()
+        stats.game_active = True
+
+        # Очищение списков прищельцев и пуль
+        aliens.empty()
+        bullets.empty()
+
+        #Создание нового флота и размещеие корабля в центре
+        create_fleet(ai_setting, screen, ship, aliens)
+        ship.center_ship()
+
+def update_screen(ai_setting, screen, ship, alians, bullets, play_button, stats):
     #Обнавляет изображение на экране и отображает новый экран
     screen.fill(ai_setting.bg_color)
     for bullet in bullets.sprites():
@@ -43,6 +62,9 @@ def update_screen(ai_setting, screen, ship, alians, bullets):
     ship.blitme()
     #alian.blitme()
     alians.draw(screen)
+    # Кнопка Play отображается в том случае, если игра неактивна
+    if not stats.game_active:
+        play_button.draw_button()
     #Отображение последнего прорисованного экрана
     pygame.display.flip()
 
